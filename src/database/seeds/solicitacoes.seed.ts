@@ -13,6 +13,11 @@ const dados = [
     centroCusto: 'TI-INFRA',
     prioridade: 'urgente' as const,
   },
+  {
+    titulo: 'Solicitação para teste de rejeição',
+    centroCusto: 'TI-DEV',
+    prioridade: 'normal' as const,
+  },
 ];
 
 async function executar() {
