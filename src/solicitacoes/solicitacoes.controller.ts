@@ -18,6 +18,7 @@ import { CriarSolicitacaoDto } from './dto/criar-solicitacao.dto';
 import { FiltrarSolicitacoesDto } from './dto/filtrar-solicitacao.dto';
 import { AprovarSolicitacaoDto } from './dto/aprovar-solicitacao.dto';
 import { RejeitarSolicitacaoDto } from './dto/rejeitar-solicitacao.dto';
+import { CentroCustoSolicitacaoDto } from './dto/centro-custo--solicitacao.dto';
 
 type RequisicaoAutenticada = {
   user: { id: number; papel: string };
@@ -70,4 +71,15 @@ export class SolicitacoesController {
   ) {
     return this.solicitacoesService.rejeitar(id, dto.versao, dto.justificativa, request.user.id);
   }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('gestor')
+  @Get('centros-custo/:codigo')
+  ConsultarCentroCusto(
+    @Param('codigo', ParseIntPipe) codigo: number,
+    @Body() dto: CentroCustoSolicitacaoDto,
+    @Req() request: RequisicaoAutenticada, 
+  ){
+    return this.solicitacoesService.consultarCentroCusto(codigo, dto.versao, dto.saldo, request.user.id);
+ }
 }

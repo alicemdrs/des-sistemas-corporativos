@@ -6,6 +6,7 @@ import { FiltrarSolicitacoesDto } from './dto/filtrar-solicitacao.dto';
 import { Solicitacao } from './solicitacao.entity';
 import { DataSource } from 'typeorm';
 import { Auditoria } from '../auditoria/auditoria.entity';
+import { CentroCustoSolicitacaoDto } from './dto/centro-custo--solicitacao.dto';
 
 @Injectable()
 export class SolicitacoesService {
@@ -57,6 +58,18 @@ export class SolicitacoesService {
     return this.repository.save(solicitacao);
   }
 
+  async consultarCentroCusto(codigo: number, versao: number, saldo: boolean, atorId: number) {
+    const solicitacao = await this.repository.findOneBy({ centroCusto: codigo.toString() });
+
+    if (!solicitacao) {
+      throw new NotFoundException('Solicitação não encontrada');
+    }
+
+    if (solicitacao.versao !== versao) {
+      throw new ConflictException('A solicitação foi alterada; consulte novamente');
+    }
+  }
+
   async aprovar(id: number, versaoEsperada: number, atorId: number) {
   return this.dataSource.transaction(async (manager) => {
     const solicitacao = await manager.findOneBy(Solicitacao, { id });
@@ -75,6 +88,7 @@ export class SolicitacoesService {
       .where('id = :id', { id })
       .andWhere('versao = :versao', { versao: versaoEsperada })
       .andWhere('status = :status', { status: 'pendente' })
+      .andWhere('centroCusto = :centroCusto', { centroCusto: codigo.toString() })
       .execute();
 
     if (resultado.affected !== 1) {
